@@ -1,0 +1,44 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./api
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: local
+      FEATURE_ANALYTICS: "true"
+      WELCOME_MESSAGE: Running from docker-compose
+      WORKER_SERVICE_URL: http://worker:8001
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: localredis
+    depends_on:
+      - worker
+      - redis
+    networks:
+      default:
+        aliases:
+          - api-service
+
+  worker:
+    build:
+      context: ./worker
+    ports:
+      - "8001:8001"
+    environment:
+      APP_ENV: local
+      WORKER_NAME: compose-worker
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--requirepass", "localredis"]
+    ports:
+      - "6379:6379"

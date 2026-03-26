@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kubernetes Microservices Demo</title>
+    <style>
+      :root {
+        --bg: #f3efe4;
+        --panel: #fffdf8;
+        --ink: #18230f;
+        --accent: #2f7d32;
+        --muted: #5c6b58;
+        --border: #d6d0c4;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Georgia", "Times New Roman", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(47, 125, 50, 0.18), transparent 32%),
+          linear-gradient(135deg, #efe7d4, var(--bg));
+      }
+
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 48px 20px 80px;
+      }
+
+      .hero {
+        padding: 28px;
+        border: 1px solid var(--border);
+        background: rgba(255, 253, 248, 0.88);
+        backdrop-filter: blur(4px);
+        box-shadow: 0 24px 60px rgba(24, 35, 15, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2.4rem, 5vw, 4.6rem);
+        line-height: 0.95;
+      }
+
+      p {
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        margin-top: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        background: var(--panel);
+        padding: 18px;
+      }
+
+      .label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .value {
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+
+      button {
+        margin-top: 24px;
+        border: 0;
+        padding: 12px 18px;
+        background: var(--ink);
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      pre {
+        margin-top: 24px;
+        padding: 16px;
+        border: 1px solid var(--border);
+        background: #f7f2e8;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>Config-Driven Kubernetes App</h1>
+        <p>
+          Frontend, API, worker, and Redis wired together with Docker and Kubernetes.
+        </p>
+        <button id="refresh">Refresh Service State</button>
+        <div class="grid">
+          <div class="card">
+            <span class="label">Environment</span>
+            <div class="value" id="env">-</div>
+          </div>
+          <div class="card">
+            <span class="label">Welcome Message</span>
+            <div class="value" id="message">-</div>
+          </div>
+          <div class="card">
+            <span class="label">Feature Flag</span>
+            <div class="value" id="feature">-</div>
+          </div>
+          <div class="card">
+            <span class="label">Request Count</span>
+            <div class="value" id="count">-</div>
+          </div>
+          <div class="card">
+            <span class="label">Worker</span>
+            <div class="value" id="worker">-</div>
+          </div>
+        </div>
+        <pre id="raw">Loading...</pre>
+      </section>
+    </main>
+
+    <script>
+      async function loadState() {
+        const response = await fetch("/api/info");
+        const data = await response.json();
+
+        document.getElementById("env").textContent = data.environment;
+        document.getElementById("message").textContent = data.welcome_message;
+        document.getElementById("feature").textContent = data.feature_analytics ? "enabled" : "disabled";
+        document.getElementById("count").textContent = String(data.request_count);
+        document.getElementById("worker").textContent = data.worker.worker_name;
+        document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
+      }
+
+      document.getElementById("refresh").addEventListener("click", loadState);
+      loadState().catch((error) => {
+        document.getElementById("raw").textContent = String(error);
+      });
+    </script>
+  </body>
+</html>
