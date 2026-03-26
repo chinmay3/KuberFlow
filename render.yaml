@@ -47,7 +47,6 @@ services:
     region: oregon
     dockerfilePath: ./worker/Dockerfile
     dockerContext: ./worker
-    healthCheckPath: /healthz
     envVars:
       - key: APP_ENV
         value: production
