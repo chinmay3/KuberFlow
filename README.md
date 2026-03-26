@@ -2,6 +2,8 @@
 
 KuberFlow is a microservices-based web application built to demonstrate Docker, Kubernetes, and DevOps fundamentals through a practical project. It includes a static frontend served with NGINX, a FastAPI backend API, a second FastAPI worker service for internal service-to-service communication, and Redis for shared state. The project was built to show how multiple services can be containerized, connected, configured, and deployed with rolling updates, health checks, ingress routing, and configuration-driven behavior.
 
+![KuberFlow Screenshot](image.png)
+
 ## What The Project Does
 
 The frontend displays live application data by calling the backend API. The API reads environment-based configuration, stores and updates a request counter in Redis, and calls the worker service using internal service discovery. The worker responds with mock processing data so the app demonstrates communication across multiple services instead of only one backend.
