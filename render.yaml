@@ -1,0 +1,61 @@
+services:
+  - type: web
+    runtime: docker
+    name: kuberflow-frontend
+    plan: free
+    region: oregon
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    healthCheckPath: /healthz
+    envVars:
+      - key: API_UPSTREAM
+        fromService:
+          type: web
+          name: kuberflow-api
+          property: hostport
+
+  - type: web
+    runtime: docker
+    name: kuberflow-api
+    plan: free
+    region: oregon
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: ./api
+    healthCheckPath: /healthz
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: FEATURE_ANALYTICS
+        value: "true"
+      - key: WELCOME_MESSAGE
+        value: Hosted on Render
+      - key: WORKER_SERVICE_URL
+        fromService:
+          type: pserv
+          name: kuberflow-worker
+          property: hostport
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kuberflow-redis
+          property: connectionString
+
+  - type: pserv
+    runtime: docker
+    name: kuberflow-worker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./worker/Dockerfile
+    dockerContext: ./worker
+    healthCheckPath: /healthz
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: WORKER_NAME
+        value: render-worker
+
+  - type: keyvalue
+    name: kuberflow-redis
+    plan: free
+    region: oregon
+    ipAllowList: []

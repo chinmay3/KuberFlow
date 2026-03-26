@@ -14,13 +14,17 @@ WORKER_SERVICE_URL = os.getenv("WORKER_SERVICE_URL", "http://worker-service:8001
 REDIS_HOST = os.getenv("REDIS_HOST", "redis-service")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
+REDIS_URL = os.getenv("REDIS_URL")
 
-redis_client = redis.Redis(
-    host=REDIS_HOST,
-    port=REDIS_PORT,
-    password=REDIS_PASSWORD or None,
-    decode_responses=True,
-)
+if REDIS_URL:
+    redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
+else:
+    redis_client = redis.Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        password=REDIS_PASSWORD or None,
+        decode_responses=True,
+    )
 
 
 @app.get("/healthz")
@@ -50,4 +54,3 @@ async def info() -> dict:
         "request_count": request_count,
         "worker": worker_payload,
     }
-

@@ -42,6 +42,31 @@ docker build -t kuber-api:latest ./api
 docker build -t kuber-worker:latest ./worker
 ```
 
+## Quick Hosting on Render
+
+This repo includes a `render.yaml` blueprint so the app can be hosted quickly as:
+
+- `kuberflow-frontend` as a public web service
+- `kuberflow-api` as a public web service
+- `kuberflow-worker` as a private service
+- `kuberflow-redis` as a managed key-value instance
+
+The frontend proxies `/api` to the API over Render's private network, and the API connects to the worker and Redis through Render-managed service discovery values.
+
+To deploy:
+
+1. Push the repo to GitHub.
+2. In Render, create a new Blueprint and select this repository.
+3. Review the services from `render.yaml` and create them.
+4. Wait for the services to finish building.
+5. Open the `kuberflow-frontend` URL.
+
+The Render blueprint uses:
+
+- `API_UPSTREAM` for frontend-to-API proxying
+- `WORKER_SERVICE_URL` for API-to-worker calls
+- `REDIS_URL` for Redis connectivity
+
 ## Kubernetes Deploy
 
 1. Build and push images to your registry.
@@ -90,4 +115,3 @@ kubectl rollout status deployment/api-deployment
 - Rolling updates
 - Liveness and readiness probes
 - Redis-backed shared state
-

@@ -2,6 +2,8 @@ services:
   frontend:
     build:
       context: ./frontend
+    environment:
+      API_UPSTREAM: http://api-service:8000
     ports:
       - "8080:80"
     depends_on:
